@@ -73,3 +73,11 @@ private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm {
   }
 }
 
+private[spark] class ROCKSchedulingAlgorithm extends SchedulingAlgorithm {
+  override def comparator(s1: Schedulable, s2: Schedulable): Boolean = {
+    val score1 = s1.runningTasks.toDouble * s1.priority.toDouble * s1.stageId.toDouble / (math.max(s1.minShare, 1.0) * s1.weight.toDouble)
+    val score2 = s2.runningTasks.toDouble * s2.priority.toDouble * s2.stageId.toDouble / (math.max(s2.minShare, 1.0) * s2.weight.toDouble)
+    var res = math.signum(score1 - score2)
+    res < 0
+  }
+}
